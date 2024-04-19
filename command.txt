@@ -1,0 +1,3 @@
+scp -r C:\Users\chao\Downloads\condor-examples cj00677@cscondor.eps.surrey.ac.uk:/user/HS500/cj00677  # 上传一个文件夹
+
+scp -r cj00677@cscondor.eps.surrey.ac.uk:/user/HS500/cj00677/condor-examples  C:                     # 下载一个文件夹

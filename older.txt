@@ -1,0 +1,123 @@
+This file gives instructions for running some simple examples on the orca pool.
+The examples are in this onedrive folder, modified slightly from those on the BookStack Website (more details on that below).
+
+----------
+orca pool
+----------
+
+200 machines.
+Each one has Nvidia Quadro P4000 Graphics Card.
+Each card has 8GB memory. Your batch for training needs to fit in this.
+There are workarounds for big models, e.g.
+https://medium.com/syncedreview/how-to-train-a-very-large-and-deep-model-on-one-gpu-7b7edfe2d072
+
+orca is the 200 seater lab. If someone comes and sits at the computer running your job, and uses it,
+your job will be evicted back into the queue.
+You could make save-points (checkpoint) to save your partially trained model and resume from where it left off later.
+But the risk is low if the lab is mostly empty.
+Also you can run jobs overnight.
+
+You submit jobs into the queue and they will run on any available machine.
+You can submit multiple jobs, potentially running multiple models in parallel on different machines.
+The results get saved into your own filespace.
+
+
+----------------
+How to run jobs
+----------------
+
+If you are on windows you need the PuTTY program to ssh (PuTTY is free to download).
+
+If you are in the university then ssh to orca.eps.surrey.ac.uk
+(in putty type orca.eps.surrey.ac.uk into the Host Name box, then click Open)
+
+If you are outside the university then you need to first connect to access.eps.surrey.ac.uk
+ ssh access.eps.surrey.ac.uk
+and when you are in there you
+ ssh orca.eps.surrey.ac.uk
+
+(access requires Two-Factor Authentication
+see https://surrey-content.surrey.ac.uk/sites/default/files/2019-10/2fa-guide-feps.pdf
+)
+
+Copy all the files in this onedrive folder into some folder in your home filespace.
+e.g. to folder condor-examples
+
+--------------------------
+Simple hello world example
+--------------------------
+
+Type
+ condor_submit example01.submit_file 
+
+you can open example01.submit_file with any text editor to see the commands submitted.
+
+This will run 50 jobs echoing their process ID.
+It creates files from each run.
+The out files have output from the script run - in this case echoing HelloWorld from process x!
+The log files have the condor logs - with information about resource usage.
+The error files will show errors from your job if any.
+
+There is an picture of this running in example1.gif
+
+-----------------------------------------------------
+Example PyTorch program training CNN on MNIST dataset  
+-----------------------------------------------------
+
+This will download a miniconda for you and take up 10GB of your disk space.
+
+Type
+ bash setup.sh
+
+It will take a while.
+
+Next we will run the PyTorch Job which trains a simple network on MNIST dataset
+When ready type
+ condor_submit example08mod.submit_file
+
+It will train the model.
+Type
+ condor_q
+to see that your job is running.
+You should see something like
+
+ -- Schedd: orca.eps.surrey.ac.uk : <131.227.81.70:9618?... @ 03/16/20 15:59:02
+ OWNER  BATCH_NAME    SUBMITTED   DONE   RUN    IDLE  TOTAL JOB_IDS
+ fg0022 ?testjob?    3/16 15:58      _      1      _      1 45257.0
+
+ 1 jobs; 0 completed, 0 removed, 0 idle, 1 running, 0 held, 0 suspended
+
+The important thing is 1 running.
+If it's not running it might be idle waiting for an available machine, or there might be a problem.
+e.g. it might be waiting for a machine with more memory, which doesn't exist.
+
+You can get more detail with
+ condor_q -better-analyze
+
+e.g. it will show you if your job is not running because it asked for too much resource
+
+When the training is complete you will have a .out file which will show you the 
+training epochs progressing and the loss values decreasing.
+
+you can remove (kill) a job with condor_rm <JOB_ID>
+e.g.
+ condor_rm 45257.0
+
+To see what every machine is doing:
+ condor_status
+
+Now you've finished the example, you can look inside example08mod.submit_file
+to see how it refers to the pytorch file, and how you can make it point to your own program.
+
+-----------------------------
+More commands and information
+-----------------------------
+
+The bookStack Website: (remember you need to log in at top right when you open this page)
+https://bookstack.eps.surrey.ac.uk/books/htcondor---job-scheduling/chapter/htcondor-at-university-of-surrey
+
+HTCondor for Busy People: (remember you need to log in at top right when you open this page)
+https://bookstack.eps.surrey.ac.uk/books/htcondor---job-scheduling/page/htcondor-for-busy-people
+
+HTCondor Quick Start Guide
+https://research.cs.wisc.edu/htcondor/manual/quickstart.html

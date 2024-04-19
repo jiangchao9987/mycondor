@@ -1,0 +1,47 @@
+####################
+#
+# Example Job for HTCondor
+#
+####################
+
+# --------------------------------------------
+# Executable and its arguments
+executable    = script08.sh
+#arguments     =$ENV(PWD)/mnist_pytorch.py
+JobBatchName = job
+# ---------------------------------------------------
+# Universe (vanilla, docker)
+universe         = vanilla
+#docker_image     = nvidia/cuda:10.1-cudnn7-runtime-ubuntu16.04
+
+# -------------------------------------------------
+# Event, out and error logs
+log    = c$(cluster).p$(process).log
+output = c$(cluster).p$(process).out
+error  = c$(cluster).p$(process).error
+
+# -----------------------------------
+# File Transfer, Input, Output
+should_transfer_files = YES
+
+# Make certain project spaces available in container
+#environment = "mount=$ENV(PWD)"
+
+# -------------------------------------
+# Requirements for the Job (Requirements are explained in further detail in example09.submit_file)
+# NOTE: HasDocker has been omitted
+requirements = (CUDAGlobalMemoryMb > 4500)  && \
+               (CUDACapability > 2.0)
+
+#(HasStornext) && \
+#               (TARGET.CondorPlatform == "$CondorPlatform: X86_64-Ubuntu_16.04 $") && \
+               
+# --------------------------------------
+# Resources
+request_GPUs     = 1
+request_CPUs     = 1
+request_memory   = 4G
+
+# -----------------------------------
+# Queue commands
+queue

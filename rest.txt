@@ -1,0 +1,2 @@
+arguments     = $ENV(PWD)/mnist_pytorch.py
+
