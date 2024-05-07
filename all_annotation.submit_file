@@ -1,0 +1,43 @@
+#                                                    
+# Example Job for HTCondor
+#
+####################
+
+# --------------------------------------------
+# Executable and its arguments
+executable    =/user/HS500/cj00677/mycondor/ex_all_annotation.sh
+#arguments     =$ENV(PWD)/mnist_deep.py --num_iterations 5000
+JobBatchName = annotation
+# ---------------------------------------------------
+# Docker: Executable might be stated in docker image, so can be omitted from condor submit file
+# If specified, overrides the one stated in docker image
+# Need to specify the docker image to use
+universe         = vanilla
+#docker_image     = tensorflow/tensorflow:1.12.0-gpu
+
+# -------------------------------------------------
+# Inpu, Output and Log files
+log    = c$(cluster).p$(process).log
+output = c$(cluster).p$(process).out
+error  = c$(cluster).p$(process).error
+
+# ----------------------------------
+# What to do with files.
+should_transfer_files = YES
+#transfer_input_files = mnist,mnist_deep.py
+
+# -------------------------------------
+# Requirements for the Job
+# Need to make sure GPU is suitable for the job
+#requirements = (CUDACapability >= 5)
+requirements = (CUDAGlobalMemoryMb > 4500)  && \
+               (CUDACapability > 2.0)
+# --------------------------------------
+# Resource requirements
+request_GPUs     = 1
+request_CPUs     = 1
+request_memory   = 4G
+
+# -----------------------------------
+# Queue commands
+queue 1
